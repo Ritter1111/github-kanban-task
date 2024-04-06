@@ -1,9 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { githubApi } from './api/api';
 
 export const store = configureStore({
   reducer: {
-    // user: userReducer,
+    [githubApi.reducerPath]: githubApi.reducer,
   },
+  middleware: (getDefaultMiddlware) =>
+    getDefaultMiddlware().concat(githubApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
