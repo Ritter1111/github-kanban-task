@@ -20,7 +20,6 @@ export const SearchBar = () => {
         display: 'flex',
         justifyContent: 'center',
         marginTop: '10px',
-        paddingRight: '10px',
       }}
     >
       <Search
