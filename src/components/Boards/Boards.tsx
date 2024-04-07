@@ -59,7 +59,7 @@ export const Boards = () => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <Row gutter={[16, 16]}>
+      <Row gutter={[16, 16]} style={{ margin: '0 50px' }}>
         {boards.map((board) => (
           <Board key={board.id} {...board} />
         ))}

@@ -1,6 +1,8 @@
 import { Draggable } from 'react-beautiful-dnd';
-import { Card } from 'antd';
+import { Card, Row } from 'antd';
 import { IIssueData } from '../../../types/types';
+import { Link } from 'react-router-dom';
+import { daysUnlitNow } from '../../../utils/parseData';
 
 interface IIssueList {
   issue: IIssueData;
@@ -17,7 +19,14 @@ const Issue: React.FC<IIssueList> = ({ issue, index }) => {
           {...provided.dragHandleProps}
         >
           <Card size="small">
-            <p>{issue.title}</p>
+            <Link to={issue.html_url}>{issue.title}</Link>
+            <Row style={{ margin: '10px 0' }}>
+              #{issue.number} {daysUnlitNow(issue.created_at)}
+            </Row>
+
+            <Row style={{ margin: '10px 0' }}>
+              {issue.author_association} | Comments: {issue.comments}
+            </Row>
           </Card>
         </div>
       )}
