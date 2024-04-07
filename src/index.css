@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --base-color: #dfd3c3;
+  --grey-200: #c3c3c3;
+  --grey-100: rgb(239, 239, 239);
+}
+
+body {
+  background-color: var(--base-color);
+  margin: 0 70px;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 3px;
+  background-color: var(--grey-100);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: var(--grey-200);
+  width: 3px;
+}
