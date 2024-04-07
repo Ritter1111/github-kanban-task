@@ -18,7 +18,7 @@ const Issue: React.FC<IIssueList> = ({ issue, index }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <Space direction="vertical" size={20}>
+          <Space direction="vertical" style={{ width: '100%' }}>
             <Card size="small" style={{ maxWidth: '330px' }}>
               <Link to={issue.html_url}>{issue.title}</Link>
               <Row style={{ margin: '10px 0' }}>
