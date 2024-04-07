@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { useGetReposIssuesQuery } from '../../store/api/api';
 import { categorizeIssues } from '../../utils/filterByIssuesState';
 import { IIssueData } from '../../types/types';
-import { Card, Row, Col } from 'antd';
+import { Row } from 'antd';
+import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+import Board from './Board/Board';
 
 interface IBoard {
   id: number;
@@ -12,6 +14,7 @@ interface IBoard {
 
 export const Boards = () => {
   const { data } = useGetReposIssuesQuery('Ritter1111/testsss');
+
   const [boards, setBoards] = useState<IBoard[]>([
     { id: 1, title: 'To Do', issues: [] },
     { id: 2, title: 'In Progress', issues: [] },
@@ -30,24 +33,37 @@ export const Boards = () => {
     }
   }, [data]);
 
+  const onDragEnd = (result: DropResult) => {
+    const { destination, source } = result;
+    if (
+      !destination ||
+      (destination.droppableId === source.droppableId &&
+        destination.index === source.index)
+    ) {
+      return;
+    }
+    const sourceBoardId = parseInt(source.droppableId);
+    const destinationBoardId = parseInt(destination.droppableId);
+    const updatedBoards = [...boards];
+    const [movedIssue] = updatedBoards[sourceBoardId - 1].issues.splice(
+      source.index,
+      1
+    );
+    updatedBoards[destinationBoardId - 1].issues.splice(
+      destination.index,
+      0,
+      movedIssue
+    );
+    setBoards(updatedBoards);
+  };
+
   return (
-    <Row gutter={[16, 16]}>
-      {boards.map((board) => (
-        <Col span={8} key={board.id}>
-          <Card title={board.title} style={{}}>
-            {board.issues.map((issue) => (
-              <Card
-                key={issue.id}
-                size="small"
-                style={{ margin: '10px 0' }}
-                draggable
-              >
-                <p>{issue.title}</p>
-              </Card>
-            ))}
-          </Card>
-        </Col>
-      ))}
-    </Row>
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Row gutter={[16, 16]}>
+        {boards.map((board) => (
+          <Board key={board.id} {...board} />
+        ))}
+      </Row>
+    </DragDropContext>
   );
 };
