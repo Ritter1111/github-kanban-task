@@ -18,7 +18,7 @@ const Issue: React.FC<IIssueList> = ({ issue, index }) => {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <Card size="small">
+          <Card size="small" style={{ maxWidth: '330px' }}>
             <Link to={issue.html_url}>{issue.title}</Link>
             <Row style={{ margin: '10px 0' }}>
               #{issue.number} {daysUnlitNow(issue.created_at)}

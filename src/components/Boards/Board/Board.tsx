@@ -12,23 +12,24 @@ interface IBoardProps {
 const Board: React.FC<IBoardProps> = ({ id, title, issues }) => {
   return (
     <Col span={8}>
-      <Droppable droppableId={id.toString()}>
-        {(provided) => (
-          <Card
-            title={title}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-            style={{
-              height: '70vh',
-              backgroundColor: '#A9E3E5',
-              overflowY: 'auto',
-            }}
-          >
-            <IssueList issues={issues} />
-            {provided.placeholder}
-          </Card>
-        )}
-      </Droppable>
+      <Card
+        title={title}
+        className="custom-scrollbar"
+        style={{
+          height: '70vh',
+          backgroundColor: '#f0ece2',
+          overflowY: issues.length > 1 ? 'scroll' : undefined,
+        }}
+      >
+        <Droppable droppableId={id.toString()}>
+          {(provided) => (
+            <div ref={provided.innerRef} {...provided.droppableProps}>
+              <IssueList issues={issues} />
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </Card>
     </Col>
   );
 };

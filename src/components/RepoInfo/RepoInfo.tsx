@@ -9,8 +9,8 @@ import { parseGitAndRepoNames } from '../../utils/parseGitAndRepoNames';
 import Spinner from '../Spinner/Spinner';
 
 export const RepoInfo = () => {
-  const apiUrl = useSelector((state: RootState) => state.search.url);
-  const { data, isFetching } = useGetReposInfoQuery(apiUrl);
+  const searchUrl = useSelector((state: RootState) => state.search.url);
+  const { data, isFetching } = useGetReposInfoQuery(searchUrl);
 
   if (isFetching) {
     return <Spinner />;

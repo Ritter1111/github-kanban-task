@@ -7,33 +7,34 @@ import { setBoards } from '../../store/slices/boardsSlice';
 import { useGetReposIssuesQuery } from '../../store/api/api';
 import { categorizeIssues } from '../../utils/filterByIssuesState';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import { getUpdatedBoard, setUpdatedBoard } from '../../utils/localStorage';
+import { getUpdatedBoard, saveUpdatedBoard } from '../../utils/localStorage';
 import Spinner from '../Spinner/Spinner';
 
 export const Boards = () => {
-  const apiUrl = useSelector((state: RootState) => state.search.url);
+  const searchUrl = useSelector((state: RootState) => state.search.url);
   const boards = useSelector((state: RootState) => state.boards.boards);
-  const { data, isFetching } = useGetReposIssuesQuery(apiUrl);
+  const { data, isFetching } = useGetReposIssuesQuery(searchUrl);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const storedData = getUpdatedBoard(apiUrl);
-    if (storedData) {
-      dispatch(setBoards(storedData));
+    const storedBoard = getUpdatedBoard(searchUrl);
+    if (storedBoard) {
+      dispatch(setBoards(JSON.parse(storedBoard)));
       return;
     }
     if (data) {
       const { todoIssues, inProgressIssues, doneIssues } =
         categorizeIssues(data);
 
-      const updatedBoards = [
+      const filteredBoards = [
         { id: 1, title: 'To Do', issues: todoIssues },
         { id: 2, title: 'In Progress', issues: inProgressIssues },
         { id: 3, title: 'Done', issues: doneIssues },
       ];
-      dispatch(setBoards(updatedBoards));
+
+      dispatch(setBoards(filteredBoards));
     }
-  }, [apiUrl, data, dispatch]);
+  }, [searchUrl, data, dispatch]);
 
   if (isFetching) {
     return <Spinner />;
@@ -41,6 +42,7 @@ export const Boards = () => {
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source } = result;
+
     if (
       !destination ||
       (destination.droppableId === source.droppableId &&
@@ -48,13 +50,20 @@ export const Boards = () => {
     ) {
       return;
     }
-    const sourceBoardId = parseInt(source.droppableId);
-    const destinationBoardId = parseInt(destination.droppableId);
-    const updatedBoards = [...boards];
+
+    const sourceBoardId = parseInt(source.droppableId, 10);
+    const destinationBoardId = parseInt(destination.droppableId, 10);
+
+    const updatedBoards = boards.map((board) => ({
+      ...board,
+      issues: [...board.issues],
+    }));
+
     const [movedIssue] = updatedBoards[sourceBoardId - 1].issues.splice(
       source.index,
       1
     );
+
     updatedBoards[destinationBoardId - 1].issues.splice(
       destination.index,
       0,
@@ -62,7 +71,7 @@ export const Boards = () => {
     );
 
     dispatch(setBoards(updatedBoards));
-    setUpdatedBoard(apiUrl, updatedBoards);
+    saveUpdatedBoard(searchUrl, updatedBoards);
   };
 
   return (
