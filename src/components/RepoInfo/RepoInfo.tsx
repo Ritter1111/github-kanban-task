@@ -5,34 +5,38 @@ import { FaStar } from 'react-icons/fa';
 import { formatStartCount } from '../../utils/formatStarsCount';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import { parseGitAndRepoNames } from '../../utils/parseGitAndRepoNames';
+import Spinner from '../Spinner/Spinner';
 
 export const RepoInfo = () => {
   const apiUrl = useSelector((state: RootState) => state.search.url);
-  const { data } = useGetReposInfoQuery(apiUrl);
+  const { data, isFetching } = useGetReposInfoQuery(apiUrl);
 
-  const formatRepoName = (fullName: string, baseUrl: string) => {
-    const gitPathArray = fullName.split('/');
-    const gitName = gitPathArray[0];
-    const repoName = gitPathArray[1];
-
-    return (
-      <span>
-        <a target="_blank" href={`${baseUrl}/${gitName}`}>
-          {gitName}
-        </a>
-        &nbsp;&gt;&nbsp;
-        <a target="_blank" href={`${baseUrl}/${gitName}/${repoName}`}>
-          {repoName}
-        </a>
-      </span>
-    );
-  };
+  if (isFetching) {
+    return <Spinner />;
+  }
 
   return (
     <Row style={{ gap: '15px', marginBottom: '10px' }}>
-      <div>{data && formatRepoName(data?.full_name, BASE_GIT_URL)}</div>
+      {data && (
+        <div>
+          <a
+            target="_blank"
+            href={`${BASE_GIT_URL}/${parseGitAndRepoNames(data.full_name).gitName}`}
+          >
+            {parseGitAndRepoNames(data.full_name).gitName}
+          </a>
+          &nbsp;&gt;&nbsp;
+          <a
+            target="_blank"
+            href={`${BASE_GIT_URL}/${parseGitAndRepoNames(data.full_name).fullName}`}
+          >
+            {parseGitAndRepoNames(data.full_name).repoName}
+          </a>
+        </div>
+      )}
       <Flex style={{ alignItems: 'center', gap: '5px' }}>
-        <FaStar /> {data && formatStartCount(data?.stargazers_count)} stars
+        <FaStar /> {data && formatStartCount(data.stargazers_count)} stars
       </Flex>
     </Row>
   );

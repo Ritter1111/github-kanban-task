@@ -1,40 +1,43 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { Row } from 'antd';
+import Board from './Board/Board';
+import { RootState } from '../../store/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { setBoards } from '../../store/slices/boardsSlice';
 import { useGetReposIssuesQuery } from '../../store/api/api';
 import { categorizeIssues } from '../../utils/filterByIssuesState';
-import { IIssueData } from '../../types/types';
-import { Row } from 'antd';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-import Board from './Board/Board';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
-
-interface IBoard {
-  id: number;
-  title: string;
-  issues: IIssueData[];
-}
+import { getUpdatedBoard, setUpdatedBoard } from '../../utils/localStorage';
+import Spinner from '../Spinner/Spinner';
 
 export const Boards = () => {
   const apiUrl = useSelector((state: RootState) => state.search.url);
-  const { data } = useGetReposIssuesQuery(apiUrl);
-
-  const [boards, setBoards] = useState<IBoard[]>([
-    { id: 1, title: 'To Do', issues: [] },
-    { id: 2, title: 'In Progress', issues: [] },
-    { id: 3, title: 'Done', issues: [] },
-  ]);
+  const boards = useSelector((state: RootState) => state.boards.boards);
+  const { data, isFetching } = useGetReposIssuesQuery(apiUrl);
+  const dispatch = useDispatch();
 
   useEffect(() => {
+    const storedData = getUpdatedBoard(apiUrl);
+    if (storedData) {
+      dispatch(setBoards(storedData));
+      return;
+    }
     if (data) {
       const { todoIssues, inProgressIssues, doneIssues } =
         categorizeIssues(data);
-      setBoards([
+
+      const updatedBoards = [
         { id: 1, title: 'To Do', issues: todoIssues },
         { id: 2, title: 'In Progress', issues: inProgressIssues },
         { id: 3, title: 'Done', issues: doneIssues },
-      ]);
+      ];
+      dispatch(setBoards(updatedBoards));
     }
-  }, [data]);
+  }, [apiUrl, data, dispatch]);
+
+  if (isFetching) {
+    return <Spinner />;
+  }
 
   const onDragEnd = (result: DropResult) => {
     const { destination, source } = result;
@@ -57,7 +60,9 @@ export const Boards = () => {
       0,
       movedIssue
     );
-    setBoards(updatedBoards);
+
+    dispatch(setBoards(updatedBoards));
+    setUpdatedBoard(apiUrl, updatedBoards);
   };
 
   return (

@@ -3,13 +3,13 @@ import { Droppable } from 'react-beautiful-dnd';
 import IssueList from '../IssueList/IssueList';
 import { IIssueData } from '../../../types/types';
 
-interface Board {
+interface IBoardProps {
   id: number;
   title: string;
   issues: IIssueData[];
 }
 
-const Board: React.FC<Board> = ({ id, title, issues }) => {
+const Board: React.FC<IBoardProps> = ({ id, title, issues }) => {
   return (
     <Col span={8}>
       <Droppable droppableId={id.toString()}>

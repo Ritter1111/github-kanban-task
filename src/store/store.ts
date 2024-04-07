@@ -1,9 +1,11 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { githubApi } from './api/api';
 import { searchReducer } from './slices/searchSlice';
+import { boardsReducer } from './slices/boardsSlice';
 
 const rootReducer = combineReducers({
   search: searchReducer,
+  boards: boardsReducer,
   [githubApi.reducerPath]: githubApi.reducer,
 });
 

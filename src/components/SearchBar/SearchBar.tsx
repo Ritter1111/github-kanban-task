@@ -2,13 +2,12 @@ import { Input, Space } from 'antd';
 import { FormEvent, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setSearchUrl } from '../../store/slices/searchSlice';
-import { BASE_GIT_URL } from '../../utils/consts';
-
-const { Search } = Input;
+import { extractRepoName } from '../../utils/extractRepoName';
 
 export const SearchBar = () => {
   const [searchString, setSearchString] = useState<string>('');
   const dispatch = useDispatch();
+  const { Search } = Input;
 
   const handleInputChange = (e: FormEvent<HTMLInputElement>) => {
     const target = e.target as HTMLInputElement;
@@ -16,13 +15,8 @@ export const SearchBar = () => {
   };
 
   const onSearch = (string: string) => {
-    const formettedSearchUrl = formatSearchString(string);
+    const formettedSearchUrl = extractRepoName(string);
     dispatch(setSearchUrl(formettedSearchUrl));
-  };
-
-  const formatSearchString = (url: string) => {
-    const urlArray = url.split(BASE_GIT_URL);
-    return urlArray[urlArray.length - 1];
   };
 
   return (
