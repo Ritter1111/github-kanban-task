@@ -77,3 +77,8 @@ export interface Reactions {
   rocket: number;
   eyes: number;
 }
+
+export interface IRepoInfo {
+  stargazers_count: number;
+  full_name: string;
+}
