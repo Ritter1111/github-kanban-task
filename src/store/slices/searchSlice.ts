@@ -1,10 +1,10 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
-type Schema = {
+type Search = {
   url: string;
 };
 
-const initialState: Schema = {
+const initialState: Search = {
   url: 'Ritter1111/testsss',
 };
 

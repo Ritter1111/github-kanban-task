@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Row } from 'antd';
 import Board from './Board/Board';
+import Spinner from '../Spinner/Spinner';
 import { RootState } from '../../store/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { setBoards } from '../../store/slices/boardsSlice';
@@ -8,7 +9,6 @@ import { useGetReposIssuesQuery } from '../../store/api/api';
 import { categorizeIssues } from '../../utils/filterByIssuesState';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { getUpdatedBoard, saveUpdatedBoard } from '../../utils/localStorage';
-import Spinner from '../Spinner/Spinner';
 
 export const Boards = () => {
   const searchUrl = useSelector((state: RootState) => state.search.url);
@@ -16,12 +16,46 @@ export const Boards = () => {
   const { data, isFetching } = useGetReposIssuesQuery(searchUrl);
   const dispatch = useDispatch();
 
+  const onDragEnd = useCallback(
+    (result: DropResult) => {
+      const { destination, source } = result;
+
+      if (!destination) {
+        return;
+      }
+
+      const sourceBoardId = parseInt(source.droppableId, 10);
+      const destinationBoardId = parseInt(destination.droppableId, 10);
+
+      const updatedBoards = boards.map((board) => ({
+        ...board,
+        issues: [...board.issues],
+      }));
+
+      const [movedIssue] = updatedBoards[sourceBoardId - 1].issues.splice(
+        source.index,
+        1
+      );
+
+      updatedBoards[destinationBoardId - 1].issues.splice(
+        destination.index,
+        0,
+        movedIssue
+      );
+
+      dispatch(setBoards(updatedBoards));
+      saveUpdatedBoard(searchUrl, updatedBoards);
+    },
+    [boards, dispatch, searchUrl]
+  );
+
   useEffect(() => {
     const storedBoard = getUpdatedBoard(searchUrl);
     if (storedBoard) {
       dispatch(setBoards(JSON.parse(storedBoard)));
       return;
     }
+
     if (data) {
       const { todoIssues, inProgressIssues, doneIssues } =
         categorizeIssues(data);
@@ -39,40 +73,6 @@ export const Boards = () => {
   if (isFetching) {
     return <Spinner />;
   }
-
-  const onDragEnd = (result: DropResult) => {
-    const { destination, source } = result;
-
-    if (
-      !destination ||
-      (destination.droppableId === source.droppableId &&
-        destination.index === source.index)
-    ) {
-      return;
-    }
-
-    const sourceBoardId = parseInt(source.droppableId, 10);
-    const destinationBoardId = parseInt(destination.droppableId, 10);
-
-    const updatedBoards = boards.map((board) => ({
-      ...board,
-      issues: [...board.issues],
-    }));
-
-    const [movedIssue] = updatedBoards[sourceBoardId - 1].issues.splice(
-      source.index,
-      1
-    );
-
-    updatedBoards[destinationBoardId - 1].issues.splice(
-      destination.index,
-      0,
-      movedIssue
-    );
-
-    dispatch(setBoards(updatedBoards));
-    saveUpdatedBoard(searchUrl, updatedBoards);
-  };
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>

@@ -3,6 +3,7 @@ import { Spin } from 'antd';
 const Spinner = () => {
   return (
     <div
+      data-testid="loader"
       style={{
         display: 'flex',
         justifyContent: 'center',
