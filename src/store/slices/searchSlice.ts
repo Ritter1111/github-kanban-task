@@ -5,7 +5,7 @@ type Schema = {
 };
 
 const initialState: Schema = {
-  url: 'facebook/react',
+  url: 'Ritter1111/testsss',
 };
 
 export const searchSlice = createSlice({
