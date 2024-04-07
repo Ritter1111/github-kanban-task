@@ -3,9 +3,12 @@ import { useGetReposInfoQuery } from '../../store/api/api';
 import { BASE_GIT_URL } from '../../utils/consts';
 import { FaStar } from 'react-icons/fa';
 import { formatStartCount } from '../../utils/formatStarsCount';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 export const RepoInfo = () => {
-  const { data } = useGetReposInfoQuery('facebook/react');
+  const apiUrl = useSelector((state: RootState) => state.search.url);
+  const { data } = useGetReposInfoQuery(apiUrl);
 
   const formatRepoName = (fullName: string, baseUrl: string) => {
     const gitPathArray = fullName.split('/');

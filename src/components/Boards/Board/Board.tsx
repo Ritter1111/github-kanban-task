@@ -18,7 +18,11 @@ const Board: React.FC<Board> = ({ id, title, issues }) => {
             title={title}
             ref={provided.innerRef}
             {...provided.droppableProps}
-            style={{ minHeight: '70vh', backgroundColor: '#A9E3E5' }}
+            style={{
+              height: '70vh',
+              backgroundColor: '#A9E3E5',
+              overflowY: 'auto',
+            }}
           >
             <IssueList issues={issues} />
             {provided.placeholder}

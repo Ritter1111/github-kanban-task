@@ -5,6 +5,8 @@ import { IIssueData } from '../../types/types';
 import { Row } from 'antd';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import Board from './Board/Board';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 
 interface IBoard {
   id: number;
@@ -13,7 +15,8 @@ interface IBoard {
 }
 
 export const Boards = () => {
-  const { data } = useGetReposIssuesQuery('Ritter1111/testsss');
+  const apiUrl = useSelector((state: RootState) => state.search.url);
+  const { data } = useGetReposIssuesQuery(apiUrl);
 
   const [boards, setBoards] = useState<IBoard[]>([
     { id: 1, title: 'To Do', issues: [] },

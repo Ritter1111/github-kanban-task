@@ -1,12 +1,16 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import { githubApi } from './api/api';
+import { searchReducer } from './slices/searchSlice';
+
+const rootReducer = combineReducers({
+  search: searchReducer,
+  [githubApi.reducerPath]: githubApi.reducer,
+});
 
 export const store = configureStore({
-  reducer: {
-    [githubApi.reducerPath]: githubApi.reducer,
-  },
-  middleware: (getDefaultMiddlware) =>
-    getDefaultMiddlware().concat(githubApi.middleware),
+  reducer: rootReducer,
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(githubApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
