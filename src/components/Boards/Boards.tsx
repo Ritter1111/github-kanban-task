@@ -1,5 +1,5 @@
 import { useCallback, useEffect } from 'react';
-import { Row } from 'antd';
+import { Flex, Row } from 'antd';
 import Board from './Board/Board';
 import Spinner from '../Spinner/Spinner';
 import { RootState } from '../../store/store';
@@ -9,11 +9,12 @@ import { useGetReposIssuesQuery } from '../../store/api/api';
 import { categorizeIssues } from '../../utils/filterByIssuesState';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import { getUpdatedBoard, saveUpdatedBoard } from '../../utils/localStorage';
+import { toast } from 'react-toastify';
 
 export const Boards = () => {
   const searchUrl = useSelector((state: RootState) => state.search.url);
   const boards = useSelector((state: RootState) => state.boards.boards);
-  const { data, isFetching } = useGetReposIssuesQuery(searchUrl);
+  const { data, isFetching, error } = useGetReposIssuesQuery(searchUrl);
   const dispatch = useDispatch();
 
   const onDragEnd = useCallback(
@@ -51,6 +52,7 @@ export const Boards = () => {
 
   useEffect(() => {
     const storedBoard = getUpdatedBoard(searchUrl);
+
     if (storedBoard) {
       dispatch(setBoards(JSON.parse(storedBoard)));
       return;
@@ -72,6 +74,20 @@ export const Boards = () => {
 
   if (isFetching) {
     return <Spinner />;
+  }
+
+  if (error) {
+    if ('status' in error && (error.status === 403 || error.status === 404)) {
+      toast.error(
+        'Incorrect github url! Try like this https://github.com/facebook/react'
+      );
+
+      return (
+        <Flex style={{ padding: '20px', justifyContent: 'center' }}>
+          Unable to fetch issues. Please check the URL and try again.
+        </Flex>
+      );
+    }
   }
 
   return (
